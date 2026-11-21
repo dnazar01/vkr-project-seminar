@@ -1,0 +1,87 @@
+@startuml
+!pragma layout smetana
+left to right direction
+hide circle
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam linetype ortho
+skinparam entity {
+  BackgroundColor #F8FAFC
+  BorderColor #334155
+  ArrowColor #475569
+}
+
+entity "ЗАЯВИТЕЛЬ" as Applicant {
+  * applicant_id : логический ключ
+  --
+  тип лица
+  идентифицирующие сведения
+  контакт для ответа
+}
+entity "ПРЕДСТАВИТЕЛЬСТВО" as Representation {
+  * representation_id : логический ключ
+  --
+  роль отправителя
+  представляемое лицо
+}
+entity "КОНТАКТНАЯ СЕССИЯ" as Session {
+  * session_id : логический ключ
+  --
+  подтверждённый номер
+  статус
+  срок действия
+}
+entity "КОНТАКТНАЯ ЗАПИСЬ" as Contact {
+  * contact_ref : внутренняя ссылка
+  --
+  источник: найдена / создана
+  клиентский статус [0..1]
+}
+entity "ОБРАЩЕНИЕ" as Appeal {
+  * appeal_id : логический ключ
+  --
+  направление
+  описание [0..2000]
+  способ ответа
+  дата регистрации
+}
+entity "КЛАССИФИКАЦИЯ" as Classification {
+  * classification_id : логический ключ
+  --
+  продукт
+  подпродукт [0..1]
+  тема [0..1]
+  подтема [0..1]
+}
+entity "ДОКУМЕНТ" as Document {
+  * document_ref : внутренняя ссылка
+  --
+  безопасное имя
+  формат и размер
+  статус проверки
+}
+entity "ВНУТРЕННЕЕ ЗАДАНИЕ" as Task {
+  * task_ref : внутренняя ссылка
+  --
+  вид процесса
+  состояние
+  регистрационный номер
+}
+entity "РЕЗУЛЬТАТ РЕГИСТРАЦИИ" as Result {
+  * result_id : логический ключ
+  --
+  итоговый статус
+  номер или класс ошибки
+}
+
+Applicant ||--o{ Appeal : подаёт
+Appeal ||--o| Representation : включает
+Appeal ||--|| Session : подтверждена в
+Appeal }o--|| Contact : связана с
+Appeal ||--|| Classification : классифицирована
+Appeal ||--o{ Document : содержит
+Appeal ||--o| Task : регистрируется как
+Task ||--o{ Document : использует
+Appeal ||--|| Result : завершается
+@enduml

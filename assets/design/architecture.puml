@@ -1,0 +1,40 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam componentStyle uml2
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ArrowColor #4B5563
+skinparam component {
+  BackgroundColor #F8FAFC
+  BorderColor #334155
+}
+
+actor "Заявитель" as applicant
+
+package "Публичный контур" #EAF3FF {
+  component "Публичный\nвеб-интерфейс" as web
+}
+
+package "Контролируемая граница" #FFF4D6 {
+  component "Серверный компонент\nобработки обращений" as backend
+}
+
+package "Внутренний контур" #EEF7EE {
+  component "Сервис подтверждения\nконтакта" as confirm
+  component "Сервис клиентских\nпрофилей и контактов" as profile
+  component "Сервис хранения\nдокументов" as docs
+  component "Система управления\nзаданиями" as tasks
+}
+
+actor "Сотрудник подразделения\nвторой линии" as employee
+
+applicant --> web : заполняет форму
+web --> backend : данные обращения,\nфайлы
+backend --> confirm : проверить\nконтактную сессию
+backend --> profile : сопоставить или\nсоздать контакт
+backend --> docs : загрузить и\nсвязать документ
+backend --> tasks : создать задание
+tasks --> employee : передать в рабочий процесс
+backend --> web : вернуть результат\nрегистрации
+@enduml

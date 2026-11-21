@@ -1,0 +1,55 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam sequence {
+  ArrowColor #475569
+  LifeLineBorderColor #64748B
+  ParticipantBorderColor #334155
+  ParticipantBackgroundColor #F8FAFC
+  GroupBorderColor #64748B
+  GroupBackgroundColor #F8FAFC
+}
+
+actor "Заявитель" as applicant
+participant "Публичный\nинтерфейс" as web
+participant "Серверный\nкомпонент" as server
+participant "Подтверждение\nконтакта" as confirm
+participant "Клиентские профили\nи контакты" as profile
+participant "Документы" as docs
+participant "Управление\nзаданиями" as tasks
+
+applicant -> web : вводит контакт и код
+web -> server : запрос подтверждения
+server -> confirm : проверить контакт
+confirm --> server : подтверждённая сессия
+server --> web : продолжить заполнение
+
+opt Добавлен документ
+  applicant -> web : выбирает файл
+  web -> server : передать файл
+  server -> server : проверить формат и размер
+  server -> docs : загрузить документ
+  docs --> server : внутренняя ссылка
+end
+
+applicant -> web : отправляет обращение
+web -> server : данные обращения
+server -> server : проверить сессию, поля и классификацию
+server -> profile : сопоставить подтверждённый номер,\nидентифицирующие и дополнительные признаки
+alt Существующая запись найдена
+  profile --> server : ссылка на существующий контакт
+else Совпадение отсутствует
+  server -> profile : создать контактную запись
+  profile --> server : ссылка на созданный контакт
+end
+server -> server : выбрать правило регистрации
+server -> tasks : создать задание со ссылкой на контакт
+tasks --> server : идентификатор и номер
+opt Есть документы
+  server -> docs : связать ссылки с заданием
+  docs --> server : связь подтверждена
+end
+server --> web : регистрационный номер
+web --> applicant : показать успешный результат
+@enduml
